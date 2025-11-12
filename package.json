@@ -1,0 +1,151 @@
+{
+  "name": "txt-reader",
+  "displayName": "Txt Reader",
+  "description": "Txt Reader",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "txt-reader.addFolder",
+        "title": "addFolder",
+        "icon": "$(add)",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.clearFolders",
+        "title": "Clear Folders",
+        "icon": "$(clear-all)",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.refreshExplorer",
+        "title": "Refresh",
+        "icon": "$(refresh)",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.openFile",
+        "title": "Open File",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.closeFile",
+        "title": "Close File",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.loadFile",
+        "title": "Load File",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.revealInFileExplorer",
+        "title": "Reveal In File Explorer",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.previousLine",
+        "title": "Previous Line",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.nextLine",
+        "title": "Next Line",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.editProgress",
+        "title": "Edit Progress",
+        "category": "Txt Reader"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "txtReader",
+          "title": "Txt Reader",
+          "icon": "$(book)"
+        }
+      ]
+    },
+    "views": {
+      "txtReader": [
+        {
+          "id": "txtReader.explorer",
+          "name": "Txt Reader",
+          "icon": "$(folder)",
+          "when": "true"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        
+      ],
+      "view/title": [
+        {
+          "command": "txt-reader.addFolder",
+          "when": "view == txtReader.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "txt-reader.clearFolders",
+          "when": "view == txtReader.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "txt-reader.refreshExplorer",
+          "when": "view == txtReader.explorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "txt-reader.previousLine",
+        "key": "shift+up",
+        "when": "true"
+      },
+      {
+        "command": "txt-reader.nextLine",
+        "key": "shift+down",
+        "when": "true"
+      },
+      {
+        "command": "txt-reader.closeFile",
+        "key": "alt+w",
+        "when": "true"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode.test-electron": "^2.5.2"
+  }
+}
