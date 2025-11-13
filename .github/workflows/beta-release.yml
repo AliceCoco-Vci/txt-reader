@@ -24,6 +24,13 @@ jobs:
     - name: Compile TypeScript
       run: npm run compile
 
+    - name: Get version and date info
+      id: info
+      run: |
+        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+        echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
+
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
@@ -33,14 +40,14 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: beta
-        name: "Beta Build - $(date +%Y-%m-%d)"
+        name: "Beta Build - ${{ steps.info.outputs.date }}"
         body: |
           ## 🧪 自动构建的 Beta 版本
           
           **构建信息:**
-          - 版本: $(node -p "require('./package.json').version")
+          - 版本: ${{ steps.info.outputs.version }}
           - 提交: ${{ github.sha }}
-          - 构建时间: $(date -u)
+          - 构建时间: ${{ steps.info.outputs.datetime }}
           - Node.js: 22.x
           
           **安装说明:**
