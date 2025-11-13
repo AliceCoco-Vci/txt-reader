@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 匹配 v 开头的标签，如 v1.0.0, v1.2.3
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Compile
+      run: npm run compile
+
+    - name: Package extension
+      run: |
+        npm install -g @vscode/vsce
+        vsce package
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*.vsix"
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
