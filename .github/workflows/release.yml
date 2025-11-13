@@ -67,24 +67,13 @@ jobs:
           - **Node.js**: 22.x
           - **提交**: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
 
-          ## 📝 更新内容
-
-          ${{ steps.pkg.outputs.changelog }}
-
           ## 🔧 安装说明
 
           1. 下载下方的 `.vsix` 文件
           2. 在 VSCode 中按 `Ctrl+Shift+P` (Windows) 或 `Cmd+Shift+P` (Mac)
           3. 输入 "Extensions: Install from VSIX"
           4. 选择下载的 .vsix 文件进行安装
-
-          ## 📋 校验信息
-
-          ```bash
-          # SHA256 校验和
-          sha256sum: ${{ hashFiles('*.vsix') }}
-          ```
-
+          
           ---
           *此版本为自动构建的生产版本*
         draft: false
