@@ -29,9 +29,9 @@ jobs:
       run: |
         echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
-        echo "time=$(date +%H%M%S)" >> $GITHUB_OUTPUT
-        echo "datetime=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_OUTPUT
+        echo "date=$(TZ='Asia/Shanghai' date +%Y%m%d)" >> $GITHUB_OUTPUT
+        echo "time=$(TZ='Asia/Shanghai' date +%H%M%S)" >> $GITHUB_OUTPUT
+        echo "datetime=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_OUTPUT
 
     - name: Package extension
       run: |
@@ -42,7 +42,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: beta
-        name: "Beta Build - ${{ steps.pkg.outputs.date }} ${{ steps.pkg.outputs.time }}"
+        name: "Beta Build - ${{ steps.pkg.outputs.date }}"
         body: |
           ## 🧪 自动构建的 Beta 版本
           
