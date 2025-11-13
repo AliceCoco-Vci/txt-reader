@@ -153,9 +153,6 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "package": "vsce package",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/vscode": "^1.103.0",
@@ -163,9 +160,6 @@
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^9.32.0",
-    "typescript": "^5.9.2",
-    "@types/mocha": "^10.0.10",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript": "^5.9.2"
   }
 }

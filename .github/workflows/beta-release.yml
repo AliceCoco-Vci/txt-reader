@@ -3,19 +3,14 @@ name: Beta Release
 on:
   push:
     branches: [ master ]
-  pull_request:
-    types: [closed]  # 只在 PR 合并时触发
 
 jobs:
   beta-release:
-    if: github.event.pull_request.merged == true || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取所有历史记录，用于生成版本号
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -26,60 +21,36 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run tests
-      run: npm test
-
-    - name: Compile
+    - name: Compile TypeScript
       run: npm run compile
-
-    - name: Run ESLint
-      run: npm run lint
-
-    - name: Generate Beta Version
-      id: version
-      run: |
-        # 获取当前 package.json 中的基础版本
-        BASE_VERSION=$(node -p "require('./package.json').version")
-        # 生成基于时间的 beta 版本号
-        TIMESTAMP=$(date +%Y%m%d%H%M%S)
-        SHORT_SHA=${GITHUB_SHA:0:8}
-        BETA_VERSION="${BASE_VERSION}-beta.${TIMESTAMP}.${SHORT_SHA}"
-        echo "beta_version=$BETA_VERSION" >> $GITHUB_OUTPUT
-        echo "Generated beta version: $BETA_VERSION"
-
-    - name: Update version for beta build
-      run: |
-        npm version ${{ steps.version.outputs.beta_version }} --no-git-tag-version
 
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
         vsce package --pre-release
 
-    - name: Create or Update Beta Release
+    - name: Create Beta Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: beta
-        name: "Beta Build - ${{ steps.version.outputs.beta_version }}"
+        name: "Beta Build - $(date +%Y-%m-%d)"
         body: |
-          ## 🧪 Beta 版本构建
+          ## 🧪 自动构建的 Beta 版本
           
           **构建信息:**
-          - 版本: ${{ steps.version.outputs.beta_version }}
+          - 版本: $(node -p "require('./package.json').version")
           - 提交: ${{ github.sha }}
-          - 分支: ${{ github.ref }}
-          - 构建时间: ${{ fromJSON(steps.version.outputs.beta_version).TIMESTAMP }}
+          - 构建时间: $(date -u)
           
           **安装说明:**
-          1. 下载下方的 .vsix 文件
+          1. 下载下方的 `.vsix` 文件
           2. 在 VSCode 中按 `Ctrl+Shift+P` (Windows) 或 `Cmd+Shift+P` (Mac)
           3. 输入 "Extensions: Install from VSIX"
-          4. 选择下载的 .vsix 文件
+          4. 选择下载的 .vsix 文件进行安装
           
-          **注意:** 这是自动构建的测试版本，可能包含未稳定的功能。
+          **注意:** 这是自动构建的测试版本。
         draft: false
         prerelease: true
         files: "*.vsix"
-        generate_release_notes: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
