@@ -1,17 +1,19 @@
-name: Release
+name: Production Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*'  # 触发条件：推送 v 开头的标签，如 v1.0.0, v1.2.3
 
 jobs:
-  release:
+  production-release:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -20,47 +22,76 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci  # 使用 ci 确保依赖版本精确
 
     - name: Compile TypeScript
       run: npm run compile
 
-    - name: Get version and date info
-      id: info
+    - name: Get package info
+      id: pkg
       run: |
+        echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-        echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
-        echo "timestamp=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
-        # 获取扩展名（从 package.json 的 name 字段）
-        echo "extension_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
+        echo "description=$(node -p "require('./package.json').description")" >> $GITHUB_OUTPUT
+        echo "build_date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_OUTPUT
+        echo "changelog=$(git log --oneline -n 20 --format='- %s' $(git describe --tags --abbrev=0 2>/dev/null || echo 'HEAD')..HEAD || echo 'Initial release')" >> $GITHUB_OUTPUT
+
+    - name: Validate version match
+      run: |
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+          echo "❌ 错误: Git 标签版本 ($TAG_VERSION) 与 package.json 版本 ($PACKAGE_VERSION) 不匹配"
+          exit 1
+        fi
 
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
-        vsce package --out ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
+        vsce package --out ${{ steps.pkg.outputs.name }}-${{ steps.pkg.outputs.version }}.vsix
 
-    - name: Create Release
+    - name: Create Production Release
       uses: softprops/action-gh-release@v1
       with:
-        name: "Release v${{ steps.info.outputs.version }} - ${{ steps.info.outputs.date }}"
+        tag_name: ${{ github.ref_name }}
+        name: "v${{ steps.pkg.outputs.version }}"
         body: |
-          ## 🚀 正式版本发布
-          
-          **构建信息:**
-          - 版本: ${{ steps.info.outputs.version }}
-          - 提交: ${{ github.sha }}
-          - 构建时间: ${{ steps.info.outputs.datetime }}
-          - Node.js: 22.x
-          - 文件: ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
-          
-          **安装说明:**
+          # 🎉 ${{ steps.pkg.outputs.name }} v${{ steps.pkg.outputs.version }}
+
+          **${{ steps.pkg.outputs.description }}**
+
+          ## 📦 发布信息
+
+          - **版本**: v${{ steps.pkg.outputs.version }}
+          - **构建时间**: ${{ steps.pkg.outputs.build_date }}
+          - **Node.js**: 22.x
+          - **提交**: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+
+          ## 📝 更新内容
+
+          ${{ steps.pkg.outputs.changelog }}
+
+          ## 🔧 安装说明
+
           1. 下载下方的 `.vsix` 文件
           2. 在 VSCode 中按 `Ctrl+Shift+P` (Windows) 或 `Cmd+Shift+P` (Mac)
           3. 输入 "Extensions: Install from VSIX"
           4. 选择下载的 .vsix 文件进行安装
+
+          ## 📋 校验信息
+
+          ```bash
+          # SHA256 校验和
+          sha256sum: ${{ hashFiles('*.vsix') }}
+          ```
+
+          ---
+          *此版本为自动构建的生产版本*
         draft: false
         prerelease: false
-        files: "*.vsix"
+        files: |
+          *.vsix
+          LICENSE
+          README.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

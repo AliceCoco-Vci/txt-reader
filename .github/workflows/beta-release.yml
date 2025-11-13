@@ -24,30 +24,33 @@ jobs:
     - name: Compile TypeScript
       run: npm run compile
 
-    - name: Get version and date info
-      id: info
+    - name: Get package info
+      id: pkg
       run: |
+        echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-        echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
+        echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+        echo "time=$(date +%H%M%S)" >> $GITHUB_OUTPUT
+        echo "datetime=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_OUTPUT
 
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
-        vsce package --pre-release --out ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
+        vsce package --pre-release --out ${{ steps.pkg.outputs.name }}-${{ steps.pkg.outputs.version }}-beta-${{ steps.pkg.outputs.date }}.vsix
 
     - name: Create Beta Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: beta
-        name: "Beta Build - ${{ steps.info.outputs.date }}"
+        name: "Beta Build - ${{ steps.pkg.outputs.date }} ${{ steps.pkg.outputs.time }}"
         body: |
           ## 🧪 自动构建的 Beta 版本
           
           **构建信息:**
-          - 版本: ${{ steps.info.outputs.version }}
+          - 扩展: ${{ steps.pkg.outputs.name }}
+          - 版本: ${{ steps.pkg.outputs.version }}
           - 提交: ${{ github.sha }}
-          - 构建时间: ${{ steps.info.outputs.datetime }}
+          - 构建时间: ${{ steps.pkg.outputs.datetime }}
           - Node.js: 22.x
           
           **安装说明:**
