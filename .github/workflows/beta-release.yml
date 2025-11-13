@@ -31,7 +31,7 @@ jobs:
         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
         echo "date=$(TZ='Asia/Shanghai' date +%Y%m%d)" >> $GITHUB_OUTPUT
         echo "time=$(TZ='Asia/Shanghai' date +%H%M%S)" >> $GITHUB_OUTPUT
-        echo "datetime=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_OUTPUT
+        echo "datetime=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S UTC+8')" >> $GITHUB_OUTPUT
 
     - name: Package extension
       run: |
