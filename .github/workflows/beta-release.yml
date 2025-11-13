@@ -2,7 +2,7 @@ name: Beta Release
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main, master ]
 
 jobs:
   beta-release:
@@ -15,7 +15,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: '22.x'
         cache: 'npm'
 
     - name: Install dependencies
@@ -41,14 +41,13 @@ jobs:
           - 版本: $(node -p "require('./package.json').version")
           - 提交: ${{ github.sha }}
           - 构建时间: $(date -u)
+          - Node.js: 22.x
           
           **安装说明:**
           1. 下载下方的 `.vsix` 文件
           2. 在 VSCode 中按 `Ctrl+Shift+P` (Windows) 或 `Cmd+Shift+P` (Mac)
           3. 输入 "Extensions: Install from VSIX"
           4. 选择下载的 .vsix 文件进行安装
-          
-          **注意:** 这是自动构建的测试版本。
         draft: false
         prerelease: true
         files: "*.vsix"
