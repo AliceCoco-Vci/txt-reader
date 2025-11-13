@@ -34,7 +34,7 @@ jobs:
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
-        vsce package --pre-release
+        vsce package --pre-release --out ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
 
     - name: Create Beta Release
       uses: softprops/action-gh-release@v1

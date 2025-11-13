@@ -3,12 +3,12 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'  # 匹配 v 开头的标签，如 v1.0.0, v1.2.3
+      - 'v*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -16,24 +16,51 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: '22.x'
         cache: 'npm'
 
     - name: Install dependencies
       run: npm install
 
-    - name: Compile
+    - name: Compile TypeScript
       run: npm run compile
+
+    - name: Get version and date info
+      id: info
+      run: |
+        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+        echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
+        echo "timestamp=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+        # 获取扩展名（从 package.json 的 name 字段）
+        echo "extension_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
 
     - name: Package extension
       run: |
         npm install -g @vscode/vsce
-        vsce package
+        vsce package --out ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
+        name: "Release v${{ steps.info.outputs.version }} - ${{ steps.info.outputs.date }}"
+        body: |
+          ## 🚀 正式版本发布
+          
+          **构建信息:**
+          - 版本: ${{ steps.info.outputs.version }}
+          - 提交: ${{ github.sha }}
+          - 构建时间: ${{ steps.info.outputs.datetime }}
+          - Node.js: 22.x
+          - 文件: ${{ steps.info.outputs.extension_name }}-${{ steps.info.outputs.version }}-${{ steps.info.outputs.timestamp }}.vsix
+          
+          **安装说明:**
+          1. 下载下方的 `.vsix` 文件
+          2. 在 VSCode 中按 `Ctrl+Shift+P` (Windows) 或 `Cmd+Shift+P` (Mac)
+          3. 输入 "Extensions: Install from VSIX"
+          4. 选择下载的 .vsix 文件进行安装
+        draft: false
+        prerelease: false
         files: "*.vsix"
-        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
