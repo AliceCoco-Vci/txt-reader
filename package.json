@@ -2,7 +2,13 @@
   "name": "txt-reader",
   "displayName": "Txt Reader",
   "description": "Txt Reader",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "license": "MIT",
+  "publisher": "AliceCoco",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AliceCoco-Vci/txt-reader.git"
+  },
   "engines": {
     "vscode": "^1.103.0"
   },
@@ -65,6 +71,17 @@
         "command": "txt-reader.editProgress",
         "title": "Edit Progress",
         "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.jumpToChapter",
+        "title": "Jump to Chapter",
+        "category": "Txt Reader"
+      },
+      {
+        "command": "txt-reader.refreshChapters",
+        "title": "Refresh Chapters",
+        "icon": "$(refresh)",
+        "category": "Txt Reader"
       }
     ],
     "viewsContainers": {
@@ -83,13 +100,17 @@
           "name": "Txt Reader",
           "icon": "$(folder)",
           "when": "true"
+        },
+        {
+          "id": "txtReader.chapters",
+          "name": "章节列表",
+          "icon": "$(list-ordered)",
+          "when": "txt-reader.hasFile"
         }
       ]
     },
     "menus": {
-      "commandPalette": [
-        
-      ],
+      "commandPalette": [],
       "view/title": [
         {
           "command": "txt-reader.addFolder",
@@ -107,9 +128,7 @@
           "group": "navigation"
         }
       ],
-      "view/item/context": [
-        
-      ]
+      "view/item/context": []
     },
     "keybindings": [
       {
@@ -133,19 +152,14 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.103.0",
-    "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^9.32.0",
-    "typescript": "^5.9.2",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode.test-electron": "^2.5.2"
+    "typescript": "^5.9.2"
   }
 }
