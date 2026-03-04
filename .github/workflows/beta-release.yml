@@ -61,5 +61,7 @@ jobs:
         draft: false
         prerelease: true
         files: "*.vsix"
+        allowUpdates: true
+        removeArtifacts: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
