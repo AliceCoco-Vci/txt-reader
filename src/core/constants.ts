@@ -28,4 +28,4 @@ export const STATUS_BAR_PRIORITY = {
     CONTENT: 1,
 } as const;
 
-export const DEFAULT_PATTERN = '^第\\d+章.*$';
+export const DEFAULT_PATTERN = '^(第[零一二三四五六七八九十百千万\\d○〇]+[章节卷回篇部集].*|卷.{0,20}|番外|序章|楔子|尾声|后记|正文).{0,30}$';

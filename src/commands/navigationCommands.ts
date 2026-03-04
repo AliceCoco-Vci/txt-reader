@@ -44,7 +44,7 @@ export async function editProgress(): Promise<void> {
         const success = readingStateManager.setProgress(lineNum);
 
         if (success) {
-            vscode.window.showInformationMessage(`已跳转到第 ${lineNum} 行`);
+            // vscode.window.showInformationMessage(`已跳转到第 ${lineNum} 行`);
         }
     }
 }
@@ -82,7 +82,7 @@ export async function showChapterList(): Promise<void> {
     if (selected) {
         const success = readingStateManager.navigateToChapter(selected.chapterIndex);
         if (success) {
-            vscode.window.showInformationMessage(`已跳转到: ${state.chapters[selected.chapterIndex].title}`);
+            // vscode.window.showInformationMessage(`已跳转到: ${state.chapters[selected.chapterIndex].title}`);
         }
     }
 }

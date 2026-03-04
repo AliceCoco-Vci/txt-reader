@@ -47,3 +47,5 @@ coverage/
 
 # VS Code test results
 .vscode-test/
+.claude/settings.local.json
+CLAUDE.md
